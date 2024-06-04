@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: RSS Proxy API (Go)
+  description: An API with an endpoint that fetches RSS feeds. Some RSS feeds do not allow CORS
+  version: 0.0.1
+servers:
+  - url: http://localhost:5000
+    description: Local testing
+
+paths:
+  /rss:
+    get:
+      tags:
+        - RSS
+      summary: Returns an rss feed
+      #description: URL should be encoded.
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema:
+            type: string
+      responses:
+        "200": # status code
+          description: A JSON object of an RssFeed with posts
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Feed"
+definitions:
+  Feed:
+    type: object
+    properties:
+      nickname:
+        type: string
+      author:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      updateurl:
+        type: string
+      image:
+        $ref: "#/definitions/Image"
+      items:
+        schema: array
+        items:
+          $ref: "#/definitions/Item"
+  Item:
+    type: object
+    properties:
+      title:
+        type: string
+      summary:
+        type: string
+      content:
+        type: string
+      category:
+        type: string
+      link:
+        type: string
+  Image:
+    type: object
+    properties:
+      title:
+        type: string
+      href:
+        type: string
+      url:
+        type: string
+      width:
+        type: number
+      height:
+        type: number
