@@ -11,6 +11,6 @@ COPY --from=build /api/rssProxy  .
 COPY --from=build /api/assets ./assets
 COPY --from=build /api/views ./views
 RUN ls
-EXPOSE 5000
+EXPOSE 8080
 
 CMD ["./rssProxy"]
