@@ -7,7 +7,7 @@ RUN ls
 
 FROM alpine:latest
 EXPOSE 8080
-WORKDIR /rssProxy
+WORKDIR /
 COPY --from=build /api/rssProxy  .
 COPY --from=build /api/assets ./assets
 COPY --from=build /api/views ./views
