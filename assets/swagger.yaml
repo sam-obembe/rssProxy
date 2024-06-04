@@ -4,8 +4,6 @@ info:
   description: An API with an endpoint that fetches RSS feeds. Some RSS feeds do not allow CORS
   version: 0.0.1
 servers:
-  - url: http://localhost:5000
-    description: Local testing
   - url: /
     description: Hosted
 
