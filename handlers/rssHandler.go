@@ -11,6 +11,23 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+type Feed struct {
+	Nickname    string   `json:"nickname"`
+	Title       string   `json:"title"`
+	Author      string   `json:"author"`
+	Description string   `json:"description"`
+	Link        string   `json:"link"`
+	UpdateURL   string   `json:"updatedURL"`
+	Categories  []string `json:"categories"`
+	Items       []Item   `json:"items"`
+}
+
+type Item struct {
+	Title   string `json:"title"`
+	Summary string `json:"summary"`
+	Link    string `json:"link"`
+}
+
 func GetRss(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add(constants.HEADER_KEY_CONTENT_TYPE, constants.HEADER_VALUE_APPLICATION_JSON)
 	w.Header().Add(constants.HEADER_CORS_ACCESS_CONTROL, "*")
@@ -28,7 +45,7 @@ func GetRss(w http.ResponseWriter, r *http.Request) {
 
 	if found {
 		log.Default().Println("sending from cache")
-		var response, convertok = cacheResult.(rss.Feed)
+		var response, convertok = cacheResult.(Feed)
 		if !convertok {
 			log.Default().Printf("Could not convert cache entry to type rss.Feed for %s\n", rssUrl)
 		}
@@ -36,8 +53,24 @@ func GetRss(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var feed, err = rss.Fetch(rssUrl)
 		errHandler(err, w)
-		rssCache.GetCache().Set(rssUrl, *feed, cache.DefaultExpiration)
-		json.NewEncoder(w).Encode(feed)
+		var feedEntry = Feed{Nickname: feed.Nickname,
+			Title:       feed.Title,
+			Author:      feed.Author,
+			Description: feed.Description,
+			Link:        feed.Link,
+			UpdateURL:   feed.UpdateURL,
+			Categories:  feed.Categories,
+		}
+
+		var items = []Item{}
+		for _, item := range feed.Items {
+			items = append(items, Item{Title: item.Title, Summary: item.Summary, Link: item.Link})
+		}
+
+		feedEntry.Items = items
+
+		rssCache.GetCache().Set(rssUrl, feedEntry, cache.DefaultExpiration)
+		json.NewEncoder(w).Encode(feedEntry)
 	}
 
 }
