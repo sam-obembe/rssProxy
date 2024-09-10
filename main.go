@@ -17,9 +17,9 @@ func main() {
 
 	var envPort = initializePort()
 	var mux = http.NewServeMux()
-	var fs = http.FileServer(http.Dir("assets"))
+	var fileServer = http.FileServer(http.Dir("assets"))
 
-	mux.Handle("/assets/*", http.StripPrefix("/assets/", fs))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", fileServer))
 
 	mux.HandleFunc("GET /swagger/", func(w http.ResponseWriter, r *http.Request) {
 		var t, _ = template.ParseFiles("views/swagger.html")

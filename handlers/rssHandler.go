@@ -37,26 +37,31 @@ func GetRss(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var feed, err = rss.Fetch(rssUrl)
 		errHandler(err, w)
-		var feedEntry = models.Feed{Nickname: feed.Nickname,
+
+		var feedEntry = models.Feed{
+			Nickname:    feed.Nickname,
 			Title:       feed.Title,
 			Author:      feed.Author,
 			Description: feed.Description,
 			Link:        feed.Link,
 			UpdateURL:   feed.UpdateURL,
 			Categories:  feed.Categories,
+			Items:       mapItemModels(feed.Items),
 		}
-
-		var items = []models.Item{}
-		for _, item := range feed.Items {
-			items = append(items, models.Item{Title: item.Title, Summary: item.Summary, Link: item.Link})
-		}
-
-		feedEntry.Items = items
 
 		rssCache.GetCache().Set(rssUrl, feedEntry, cache.DefaultExpiration)
 		json.NewEncoder(w).Encode(feedEntry)
 	}
+}
 
+func mapItemModels(items []*rss.Item) []models.Item {
+	var itemModels = []models.Item{}
+	for _, item := range items {
+		itemModel := models.Item{Title: item.Title, Summary: item.Summary, Link: item.Link}
+		itemModels = append(itemModels, itemModel)
+	}
+
+	return itemModels
 }
 
 func errHandler(err error, w http.ResponseWriter) {
